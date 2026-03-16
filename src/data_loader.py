@@ -1,5 +1,4 @@
 from collections import Counter
-
 import numpy as np
 
 
@@ -50,6 +49,8 @@ class Word2VecDataLoader:
         print(f"Applying subsampling (threshold = {self.sample_threshold})...")
         total_words = np.sum(self.word_counts_array)
         frequencies = self.word_counts_array / total_words
+
+        # Subsampling probability formula
         keep_probs = (np.sqrt(frequencies / self.sample_threshold) + 1) * (self.sample_threshold / frequencies)
         keep_probs = np.clip(keep_probs, 0.0, 1.0)
 
@@ -62,6 +63,7 @@ class Word2VecDataLoader:
         print(f"Subsampling complete. Corpus size reduced to {len(self.corpus_indices):,} words.")
 
     def _init_negative_sampling_distribution(self):
+        # 3/4 power empirically dampens the frequency of highly common words
         powered_counts = self.word_counts_array ** 0.75
         self.neg_sample_probs = powered_counts / np.sum(powered_counts)
         self.table_size = int(1e8)
@@ -77,14 +79,14 @@ class Word2VecDataLoader:
             self.unigram_table[curr_idx:] = self.vocab_size - 1
 
     def get_negative_samples(self, batch_size, num_samples):
+        # Fast table lookup for negative sampling
         random_indices = np.random.randint(0, self.table_size, size=(batch_size, num_samples))
         return self.unigram_table[random_indices]
 
     def prepare_data(self):
         """
         Pre-computes pairs using highly optimized vectorized slicing.
-        Applies a probabilistic mask to mathematically replicate Mikolov's
-        dynamic window sizing in pure C-level NumPy.
+        Applies a probabilistic mask to mathematically replicate dynamic window sizing.
         """
         print("Generating training pairs via vectorized slices...")
         corpus = np.array(self.corpus_indices, dtype=np.int32)
@@ -116,17 +118,20 @@ class Word2VecDataLoader:
         self.center_words_array = np.concatenate(all_centers)
         self.context_words_array = np.concatenate(all_contexts)
 
-        num_pairs = len(self.center_words_array)
-        print(f"Generated {num_pairs:,} training pairs. Shuffling...")
+        print(f"Generated {len(self.center_words_array):,} training pairs.")
 
-        # Shuffle in unison
+    def generate_batches(self, batch_size):
+        """
+        Shuffles the dataset at the start of each epoch and yields fast slices.
+        """
+        num_pairs = len(self.center_words_array)
+
+        # Epoch-level shuffling
+        # This fixes the stagnation spike at the beginning of new epochs
         shuffle_indices = np.random.permutation(num_pairs)
         self.center_words_array = self.center_words_array[shuffle_indices]
         self.context_words_array = self.context_words_array[shuffle_indices]
 
-    def generate_batches(self, batch_size):
-        """Yields fast slices from the pre-computed arrays."""
-        num_pairs = len(self.center_words_array)
         for i in range(0, num_pairs, batch_size):
             yield (
                 self.center_words_array[i: i + batch_size],

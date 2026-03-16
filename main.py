@@ -12,12 +12,11 @@ FILE_PATH = "data/raw/text8"
 MIN_COUNT = 5
 WINDOW_SIZE = 5
 EMBEDDING_DIM = 100
-INITIAL_LEARNING_RATE = 0.001
+INITIAL_LEARNING_RATE = 0.025   # Standard Word2Vec starting LR
 BATCH_SIZE = 2048
 NUM_NEG_SAMPLES = 15
 EPOCHS = 15
 SAMPLE_THRESHOLD = 1e-3
-L2_REG = 1e-4
 
 
 def main():
@@ -37,8 +36,7 @@ def main():
     model = Word2Vec(
         vocab_size=data_loader.vocab_size,
         embedding_dim=EMBEDDING_DIM,
-        learning_rate=INITIAL_LEARNING_RATE,
-        l2_reg=L2_REG
+        learning_rate=INITIAL_LEARNING_RATE
     )
 
     print("\n--- Step 3: Starting Training ---")
@@ -51,6 +49,7 @@ def main():
         total_loss = 0.0
         batch_count = 0
 
+        # generate_batches handles shuffling at the start of every epoch
         batch_generator = data_loader.generate_batches(BATCH_SIZE)
 
         for center_words, context_words in batch_generator:
@@ -74,7 +73,7 @@ def main():
 
         print(f"-> Epoch {epoch + 1} Completed. Total Avg Loss: {total_loss / (batch_count * BATCH_SIZE):.4f}")
 
-        # checkpointing
+        # Checkpointing
         epoch_timestamp = datetime.now().strftime("%Y%m%d_%H%M")
         print(f"Saving checkpoint for Epoch {epoch + 1}...")
         np.save(f"saved_models/W1_epoch{epoch + 1}_{epoch_timestamp}.npy", model.W1)
