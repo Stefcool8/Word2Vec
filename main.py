@@ -7,7 +7,6 @@ import numpy as np
 from src.data_loader import Word2VecDataLoader
 from src.word2vec import Word2Vec
 
-
 FILE_PATH = "data/raw/text8"
 MIN_COUNT = 5
 WINDOW_SIZE = 5
