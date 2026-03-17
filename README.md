@@ -22,12 +22,12 @@ If you monitor system resources during training, you will notice that CPU utiliz
 1. **The Accumulation Bomb:** Frequent words (like "the") appear hundreds of times in a single batch. To prevent race conditions and ensure every gradient update is applied correctly, we must use NumPy's `np.add.at()`. This function forces a strict, sequential, single-threaded C loop.
 2. **Batched Matmul Limitations:** While NumPy's underlying BLAS backend (OpenBLAS/MKL) excels at multithreading massive 2D matrix multiplications, it does not automatically multithread the thousands of tiny batched 1D/2D dot products required for negative sampling.
 
-Production libraries (like Gensim) achieve 100% CPU utilization by dropping out of pure Python and using Cython to release the Global Interpreter Lock (GIL) and perform lock-free atomic updates (Hogwild! training). **This codebase prioritizes pure mathematical correctness and strict adherence to the NumPy constraint over unsafe multithreaded workarounds**.
+Production libraries (like Gensim) achieve 100% CPU utilization by dropping out of pure Python and using Cython to release the Global Interpreter Lock (GIL) and perform lock-free atomic updates. **This codebase prioritizes pure mathematical correctness and strict adherence to the NumPy constraint over unsafe multithreaded workarounds**.
 
 ### Training Loss Curve
 With **15 negative samples**, the mathematical floor for cross-entropy loss on this dataset is roughly ```~3.08```. The model successfully converges and stabilizes at this mathematical limit.
 
-<div style="text-align: center;"><img src="final_models/loss_curve.png" width="50%" alt="Training Loss Curve"></div>
+[Training Loss Curve](final_models/loss_curve.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
 ## Project Structure
 
@@ -109,7 +109,7 @@ topological groupings of semantic concepts.
 python src/visualize.py
 ```
 The resulting clusters are visually appealing and informative:
-<div style="text-align: center;"><img src="final_models/cluster_plot_t-sne_adjusted.png" width="70%" alt="t-SNE Visualization of Semantic Clusters"></div>
+[t-SNE Visualization of Semantic Clusters](final_models/cluster_plot_t-sne_adjusted.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
 
 ### 5. Benchmark Accuracy
