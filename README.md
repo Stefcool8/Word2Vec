@@ -27,9 +27,9 @@ Production libraries (like Gensim) achieve 100% CPU utilization by dropping out 
 ### Training Loss Curve
 With **15 negative samples**, the mathematical floor for cross-entropy loss on this dataset is roughly ```~3.08```. The model successfully converges and stabilizes at this mathematical limit.
 
-<div style="text-align: center;">
-  <img src="final_models/loss_curve.png" alt="Training Loss Curve" style="display: block; width:80%; margin: 0 auto;">
-</div>
+<p align="center">
+  <img src="final_models/loss_curve.png" alt="Training Loss Curve" width="80%">
+</p>
 
 ## Project Structure
 
@@ -111,10 +111,9 @@ topological groupings of semantic concepts.
 python src/visualize.py
 ```
 The resulting clusters are visually appealing and informative:
-
-<div style="text-align: center;">
-  <img src="final_models/cluster_plot_t-sne_adjusted.png" alt="t-SNE Visualization of Semantic Clusters" style="display: block; width:80%; margin: 0 auto;">
-</div>
+<p align="center">
+  <img src="final_models/cluster_plot_t-sne_adjusted.png" alt="t-SNE Visualization of Semantic Clusters" width="80%">
+</p>
 
 
 ### 5. Benchmark Accuracy
